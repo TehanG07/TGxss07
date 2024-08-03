@@ -22,8 +22,16 @@ chmod +x tgxss07/tgxss07.py
 
 ## Usage
 
-```bash
-tgxss07 -u <target_url>
-tgxss07 -l <list_of_targets>
-tgxss07 -dL <list_of_domains>
+single url
+
+python TGxss07.py -u http://example.com
+
+multiple url
+
+python TGxss07.py -l urls.txt
+
+multiple domains/sub-domains
+
+python TGxss07.py -dL domains.txt
+
 
