@@ -8,14 +8,15 @@ import time
 from aiohttp import ClientSession
 from asyncio import Semaphore
 
-# Rate limiting semaphore
-semaphore = Semaphore(1)  # Allow 1 request at a time (effectively 1 per second)
+# Rate limiting semaphore for concurrency control
+CONCURRENCY_LIMIT = 10  # Number of simultaneous requests
+semaphore = Semaphore(CONCURRENCY_LIMIT)
 
 # Introduce a delay between requests (in seconds)
-REQUEST_DELAY = 1.0
+REQUEST_DELAY = 0.0  # Set to 0 for no delay
 
 async def test_xss(url, payloads, result_dir):
-    async with ClientSession() as session:
+    async with ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
         tasks = []
         for payload in payloads:
             tasks.append(check_payload(session, url, payload, result_dir))
