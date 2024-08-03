@@ -2,50 +2,55 @@
 
 import asyncio
 import aiohttp
-import json
 import os
 import argparse
+import time
 from colorama import Fore, Style
 
-async def test_xss(session, url, payload, result_file):
-    try:
-        async with session.get(url, params={'param': payload}) as response:
-            content = await response.text()
-            if payload in content:
-                # Found potential XSS vulnerability
-                print(f"{Fore.RED}{url} vulnerable to {payload}{Style.RESET_ALL}")
-                with open(result_file, 'a') as file:
-                    file.write(f"URL: {url}\nParameter: param\nPayload: {payload}\n\n")
-            else:
-                # Not vulnerable
-                print(f"{Fore.GREEN}{url} not vulnerable to {payload}{Style.RESET_ALL}")
-    except Exception as e:
-        print(f"Error testing XSS with payload {payload}: {e}")
-
-async def main():
-    parser = argparse.ArgumentParser(description='Test for XSS vulnerabilities.')
-    parser.add_argument('-u', '--url', required=True, help='The URL to test.')
-    parser.add_argument('-p', '--payload', required=True, help='File with payloads to test.')
-    parser.add_argument('-r', '--result', required=True, help='Directory to store results.')
-
-    args = parser.parse_args()
-
-    # Ensure result directory exists
-    os.makedirs(args.result, exist_ok=True)
-    result_file = os.path.join(args.result, 'xssbug.txt')
-
-    # Load payloads
-    with open(args.payload, 'r') as f:
-        payloads = f.readlines()
-
+async def test_xss(url, payloads, result_dir):
     async with aiohttp.ClientSession() as session:
         tasks = []
         for payload in payloads:
-            payload = payload.strip()
-            tasks.append(test_xss(session, args.url, payload, result_file))
-
-        # Run tasks with limited concurrency
+            tasks.append(check_payload(session, url, payload, result_dir))
         await asyncio.gather(*tasks)
 
-if __name__ == '__main__':
-    asyncio.run(main())
+async def check_payload(session, url, payload, result_dir):
+    params = {'param': payload}
+    async with session.get(url, params=params) as response:
+        if response.status == 200:
+            content = await response.text()
+            if payload in content:
+                save_xss_bug(url, payload, result_dir)
+
+def save_xss_bug(url, payload, result_dir):
+    file_path = os.path.join(result_dir, "xssbug.txt")
+    with open(file_path, "a") as f:
+        f.write(f"URL: {url}, Parameter: param, Payload: {payload}\n")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-u", "--url", required=True, help="Target URL")
+    parser.add_argument("-p", "--payload", required=True, help="Payload file (JSON or TXT)")
+    parser.add_argument("-r", "--result", required=True, help="Result directory")
+    args = parser.parse_args()
+
+    url = args.url
+    payload_file = args.payload
+    result_dir = args.result
+
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+
+    with open(payload_file, "r") as f:
+        payloads = f.read().splitlines()
+
+    start_time = time.time()  # Start time
+
+    asyncio.run(test_xss(url, payloads, result_dir))
+
+    end_time = time.time()  # End time
+    elapsed_time = end_time - start_time
+    print(f"Total execution time: {elapsed_time:.2f} seconds")
+
+if __name__ == "__main__":
+    main()
