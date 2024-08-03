@@ -2,3 +2,5 @@ Python 3.x
 requests
 beautifulsoup4
 termcolor
+
+pip install -r requirements.txt
