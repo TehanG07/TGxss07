@@ -2,5 +2,7 @@ Python 3.x
 requests
 beautifulsoup4
 termcolor
+wafw00f
 
 pip install -r requirements.txt
+pip install requests beautifulsoup4 termcolor wafw00f
