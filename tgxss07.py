@@ -7,6 +7,8 @@ import argparse
 import time
 from aiohttp import ClientSession
 from asyncio import Semaphore
+from bs4 import BeautifulSoup
+import re
 
 # Rate limiting semaphore for concurrency control
 CONCURRENCY_LIMIT = 10  # Number of simultaneous requests
@@ -14,6 +16,32 @@ semaphore = Semaphore(CONCURRENCY_LIMIT)
 
 # Introduce a delay between requests (in seconds)
 REQUEST_DELAY = 0.0  # Set to 0 for no delay
+
+async def fetch_html(session, url):
+    async with semaphore:
+        try:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    return await response.text()
+                else:
+                    print(f"Failed to fetch {url} with status code {response.status}")
+        except Exception as e:
+            print(f"Error fetching URL {url}: {e}")
+        return None
+
+async def crawl_domain(session, base_url):
+    urls = set()
+    html = await fetch_html(session, base_url)
+    if html:
+        soup = BeautifulSoup(html, 'html.parser')
+        for link in soup.find_all('a', href=True):
+            href = link['href']
+            # Handle relative URLs
+            if not href.startswith(('http://', 'https://')):
+                href = aiohttp.helpers.urljoin(base_url, href)
+            if base_url in href and href not in urls:
+                urls.add(href)
+    return urls
 
 async def test_xss(urls, payloads, result_dir):
     async with ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
@@ -62,12 +90,18 @@ def main():
     parser.add_argument("-r", "--result", required=True, help="Result directory")
     args = parser.parse_args()
 
-    urls = []
+    urls = set()
     if args.url:
-        urls.append(args.url)
+        urls.add(args.url)
     elif args.domains:
         with open(args.domains, "r") as f:
-            urls = [line.strip() for line in f if line.strip()]
+            domains = [line.strip() for line in f if line.strip()]
+            async def fetch_and_crawl():
+                async with ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
+                    for domain in domains:
+                        domain_urls = await crawl_domain(session, domain)
+                        urls.update(domain_urls)
+            asyncio.run(fetch_and_crawl())
 
     payload_file = args.payload
     result_dir = args.result
