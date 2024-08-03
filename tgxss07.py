@@ -18,18 +18,20 @@ def load_payloads(payload_files):
     return payloads
 
 def test_xss(url, payloads, result_dir):
+    """Test for XSS vulnerabilities and save results."""
+    # Ensure result directory exists
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
 
     # Detect WAF
     waf = Waf_Detect(url).waf_detect()
 
-    # Placeholder for XSS testing logic
+    result_file = os.path.join(result_dir, 'xssbug.txt')
+
     for payload in payloads:
         try:
             response = requests.get(url, params={'param': payload})
             if payload in response.text:
-                result_file = os.path.join(result_dir, 'xssbug.txt')
                 with open(result_file, 'a') as f:
                     f.write(f"URL: {url}\nParameter: param\nPayload: {payload}\n\n")
         except Exception as e:
