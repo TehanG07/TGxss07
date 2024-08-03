@@ -13,19 +13,22 @@ chmod +x tgxss07/tgxss07.py
 
 # Note:- if first command not run than try secound command.
 
-single url
+# single url
 
 python TGxss07.py -u http://example.com
+
 ./python TGxss07.py -u http://example.com
 
-multiple url
+# multiple url
 
 python TGxss07.py -l urls.txt
+
 ./python TGxss07.py -l urls.txt
 
-multiple domains/sub-domains
+# multiple domains/sub-domains
 
 python TGxss07.py -dL domains.txt
+
 ./python TGxss07.py -dL domains.txt
 
 
