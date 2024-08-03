@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
-import os
 import requests
 from bs4 import BeautifulSoup
 from termcolor import colored
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 # Define the payloads
 payloads = [
@@ -40,32 +39,37 @@ payloads = [
     "<iframe src='data:text/html;charset=utf-8,<script>alert(1)</script>'></iframe>",
 ]
 
-def find_xss_in_html(html_content):
-    results = []
-    for payload in payloads:
-        if payload in html_content:
-            results.append(payload)
-    return results
-
 def get_valid_links(url):
+    """Retrieve valid links and form actions from a given URL."""
     try:
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         links = set()
-        for tag in soup.find_all(['a', 'form', 'input', 'textarea', 'select']):
+        for tag in soup.find_all(['a', 'form']):
             href = tag.get('href')
             action = tag.get('action')
-            if href and urlparse(href).netloc:
+            if href:
+                href = urljoin(url, href)
                 links.add(href)
-            if action and urlparse(action).netloc:
+            if action:
+                action = urljoin(url, action)
                 links.add(action)
         return links
     except requests.RequestException as e:
         print(colored(f"Error fetching {url}: {e}", 'red'))
         return set()
 
+def find_xss_in_html(html_content):
+    """Search for XSS payloads in HTML content."""
+    results = []
+    for payload in payloads:
+        if re.search(re.escape(payload), html_content, re.IGNORECASE):
+            results.append(payload)
+    return results
+
 def check_xss_on_url(url):
+    """Check a URL and its links for XSS vulnerabilities."""
     valid_links = get_valid_links(url)
     for link in valid_links:
         try:
@@ -78,7 +82,7 @@ def check_xss_on_url(url):
             print(colored(f"Error fetching {link}: {e}", 'red'))
 
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print("Usage: TGxss07.py -u <target_url> or TGxss07.py -l <list_of_targets> or TGxss07.py -dL <list_of_domains>")
         sys.exit(1)
 
@@ -93,15 +97,17 @@ def main():
             urls = file.readlines()
             for url in urls:
                 url = url.strip()
-                check_xss_on_url(url)
+                if url:
+                    check_xss_on_url(url)
     elif option == '-dL':
         domains_file = sys.argv[2]
         with open(domains_file, 'r') as file:
             domains = file.readlines()
             for domain in domains:
                 domain = domain.strip()
-                url = f"http://{domain}"
-                check_xss_on_url(url)
+                if domain:
+                    url = f"http://{domain}"
+                    check_xss_on_url(url)
     else:
         print("Invalid option. Use -u, -l, or -dL.")
 
