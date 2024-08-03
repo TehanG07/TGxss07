@@ -1,4 +1,4 @@
-# tgxss07.py
+#!/usr/bin/env python3
 
 import os
 import json
