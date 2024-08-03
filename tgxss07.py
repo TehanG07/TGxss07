@@ -19,7 +19,8 @@ async def test_xss(url, payloads, result_dir):
     async with ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
         tasks = []
         for payload in payloads:
-            tasks.append(check_payload(session, url, payload, result_dir))
+            if payload.strip():  # Skip empty payloads
+                tasks.append(check_payload(session, url, payload, result_dir))
         await asyncio.gather(*tasks)
 
 async def check_payload(session, url, payload, result_dir):
@@ -31,11 +32,13 @@ async def check_payload(session, url, payload, result_dir):
                 print(f"Response status: {response.status} for payload: {payload}")  # Log response status
                 content = await response.text()
                 if payload in content:
+                    parameter = 'param'  # Update this if you use different parameters
                     print("\033[31m" + "-" * 50)
                     print(f"Vulnerable URL: {url}")
+                    print(f"Vulnerable Parameter: {parameter}")
                     print(f"Payload executed: {payload}")
                     print("-" * 50 + "\033[0m")
-                    save_xss_bug(url, payload, result_dir)
+                    save_xss_bug(url, parameter, payload, result_dir)
                 else:
                     print(f"\033[32mNo vulnerability found with payload: {payload}\033[0m")
         except Exception as e:
@@ -44,11 +47,11 @@ async def check_payload(session, url, payload, result_dir):
         # Introduce delay between requests
         await asyncio.sleep(REQUEST_DELAY)
 
-def save_xss_bug(url, payload, result_dir):
+def save_xss_bug(url, parameter, payload, result_dir):
     file_path = os.path.join(result_dir, "xssbug.txt")
     with open(file_path, "a") as f:
-        f.write(f"URL: {url}\nPayload: {payload}\n\n")
-    print(f"Saved vulnerable URL: {url} with payload: {payload}")  # Log saving operation
+        f.write(f"URL: {url}\nParameter: {parameter}\nPayload: {payload}\n\n")
+    print(f"Saved vulnerable URL: {url} with parameter: {parameter} and payload: {payload}")  # Log saving operation
 
 def main():
     parser = argparse.ArgumentParser()
