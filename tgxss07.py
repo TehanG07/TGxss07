@@ -31,8 +31,11 @@ async def check_payload(session, url, payload, result_dir):
                 print(f"Response status: {response.status} for payload: {payload}")  # Log response status
                 content = await response.text()
                 if payload in content:
-                    print(f"\033[31mVulnerable URL: {url}, Parameter: param, Payload: {payload}\033[0m")
-                    save_xss_bug(url, 'param', payload, result_dir)
+                    print("\033[31m" + "-" * 50)
+                    print(f"Vulnerable URL: {url}")
+                    print(f"Payload executed: {payload}")
+                    print("-" * 50 + "\033[0m")
+                    save_xss_bug(url, payload, result_dir)
                 else:
                     print(f"\033[32mNo vulnerability found with payload: {payload}\033[0m")
         except Exception as e:
@@ -41,10 +44,10 @@ async def check_payload(session, url, payload, result_dir):
         # Introduce delay between requests
         await asyncio.sleep(REQUEST_DELAY)
 
-def save_xss_bug(url, parameter, payload, result_dir):
+def save_xss_bug(url, payload, result_dir):
     file_path = os.path.join(result_dir, "xssbug.txt")
     with open(file_path, "a") as f:
-        f.write(f"URL: {url}, Parameter: {parameter}, Payload: {payload}\n")
+        f.write(f"URL: {url}\nPayload: {payload}\n\n")
     print(f"Saved vulnerable URL: {url} with payload: {payload}")  # Log saving operation
 
 def main():
