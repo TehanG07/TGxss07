@@ -15,12 +15,13 @@ semaphore = Semaphore(CONCURRENCY_LIMIT)
 # Introduce a delay between requests (in seconds)
 REQUEST_DELAY = 0.0  # Set to 0 for no delay
 
-async def test_xss(url, payloads, result_dir):
+async def test_xss(urls, payloads, result_dir):
     async with ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
         tasks = []
-        for payload in payloads:
-            if payload.strip():  # Skip empty payloads
-                tasks.append(check_payload(session, url, payload, result_dir))
+        for url in urls:
+            for payload in payloads:
+                if payload.strip():  # Skip empty payloads
+                    tasks.append(check_payload(session, url, payload, result_dir))
         await asyncio.gather(*tasks)
 
 async def check_payload(session, url, payload, result_dir):
@@ -55,14 +56,25 @@ def save_xss_bug(url, parameter, payload, result_dir):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", "--url", required=True, help="Target URL")
+    parser.add_argument("-u", "--url", help="Target URL")
+    parser.add_argument("-dL", "--domains", help="File containing list of domains/subdomains")
     parser.add_argument("-p", "--payload", required=True, help="Payload file (JSON or TXT)")
     parser.add_argument("-r", "--result", required=True, help="Result directory")
     args = parser.parse_args()
 
-    url = args.url
+    urls = []
+    if args.url:
+        urls.append(args.url)
+    elif args.domains:
+        with open(args.domains, "r") as f:
+            urls = [line.strip() for line in f if line.strip()]
+
     payload_file = args.payload
     result_dir = args.result
+
+    if not urls:
+        print("No URLs provided. Use -u for a single URL or -dL for a list of domains.")
+        return
 
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
@@ -71,9 +83,9 @@ def main():
         payloads = f.read().splitlines()
 
     start_time = time.time()  # Start time
-    print(f"Starting XSS testing on URL: {url} with payloads from: {payload_file}")
+    print(f"Starting XSS testing on URLs with payloads from: {payload_file}")
 
-    asyncio.run(test_xss(url, payloads, result_dir))
+    asyncio.run(test_xss(urls, payloads, result_dir))
 
     end_time = time.time()  # End time
     elapsed_time = end_time - start_time
