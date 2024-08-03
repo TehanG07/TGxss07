@@ -22,20 +22,20 @@ cd TGxss07
 
 # single url
 
-python tgxss07.py -u http://example.com
+python tgxss07.py -u http://example.com payload.json -r result
 
-./python tgxss07.py -u http://example.com
+./python tgxss07.py -u http://example.com payload.json -r ./result
 
 # multiple url
 
-python tgxss07.py -l urls.txt
+python tgxss07.py -l urls.txt -p payload.json -r result
 
-./python tgxss07.py -l urls.txt
+./python tgxss07.py -l urls.txt -p payload.json -r ./result
 
-# multiple domains/sub-domains
+# multiple domains/sub-domains 
 
-python tgxss07.py -dL domains.txt
+python tgxss07.py -dL domains.txt payload.json -r result
 
-./python tgxss07.py -dL domains.txt
+./python tgxss07.py -dL domains.txt payload.json -r ./result
 
 
