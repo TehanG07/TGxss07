@@ -32,10 +32,6 @@ python tgxss07.py -l urls.txt -p payload.txt -r result
 
 ./tgxss07.py -l urls.txt -p payload.txt  -r ./result
 
-# multiple domains/sub-domains 
 
-python tgxss07.py -dL domains.txt -p payload.txt -r result
-
-./tgxss07.py -dL domains.txt -p payload.txt -r ./result
 
 
