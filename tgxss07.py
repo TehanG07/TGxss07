@@ -9,7 +9,10 @@ from aiohttp import ClientSession
 from asyncio import Semaphore
 
 # Rate limiting semaphore
-semaphore = Semaphore(2)  # Allow 2 requests per second
+semaphore = Semaphore(1)  # Allow 1 request at a time (effectively 1 per second)
+
+# Introduce a delay between requests (in seconds)
+REQUEST_DELAY = 1.0
 
 async def test_xss(url, payloads, result_dir):
     async with ClientSession() as session:
@@ -30,6 +33,9 @@ async def check_payload(session, url, payload, result_dir):
                         save_xss_bug(url, 'param', payload, result_dir)
         except Exception as e:
             print(f"Error with URL {url}: {e}")
+
+        # Introduce delay between requests
+        await asyncio.sleep(REQUEST_DELAY)
 
 def save_xss_bug(url, parameter, payload, result_dir):
     file_path = os.path.join(result_dir, "xssbug.txt")
