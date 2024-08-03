@@ -5,15 +5,16 @@ import json
 import requests
 from waf import Waf_Detect
 
-def load_payloads(payload_file):
-    """Load payloads from JSON or TXT file."""
+def load_payloads(payload_files):
+    """Load payloads from multiple files (JSON or TXT)."""
     payloads = []
-    if payload_file.endswith('.json'):
-        with open(payload_file, 'r') as f:
-            payloads = json.load(f)
-    elif payload_file.endswith('.txt'):
-        with open(payload_file, 'r') as f:
-            payloads = [line.strip() for line in f]
+    for payload_file in payload_files:
+        if payload_file.endswith('.json'):
+            with open(payload_file, 'r') as f:
+                payloads.extend(json.load(f))
+        elif payload_file.endswith('.txt'):
+            with open(payload_file, 'r') as f:
+                payloads.extend(line.strip() for line in f)
     return payloads
 
 def test_xss(url, payloads, result_dir):
@@ -39,16 +40,16 @@ def main():
 
     parser = argparse.ArgumentParser(description="TGxss07 - XSS Vulnerability Finder")
     parser.add_argument('-u', '--url', required=True, help='URL to test for XSS vulnerabilities')
-    parser.add_argument('-p', '--payloads', default='payloads.json', help='File containing XSS payloads')
+    parser.add_argument('-p', '--payloads', nargs='+', default=['payloads.json'], help='Files containing XSS payloads (JSON or TXT)')
     parser.add_argument('-r', '--results', default='./results', help='Directory to save results')
     
     args = parser.parse_args()
 
     url = args.url
-    payload_file = args.payloads
+    payload_files = args.payloads
     result_dir = args.results
 
-    payloads = load_payloads(payload_file)
+    payloads = load_payloads(payload_files)
     test_xss(url, payloads, result_dir)
 
 if __name__ == "__main__":
