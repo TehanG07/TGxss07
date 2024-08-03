@@ -24,13 +24,16 @@ async def test_xss(url, payloads, result_dir):
 async def check_payload(session, url, payload, result_dir):
     async with semaphore:  # Rate limiting
         params = {'param': payload}
+        print(f"Testing payload: {payload} on URL: {url}")  # Log payload being tested
         try:
             async with session.get(url, params=params) as response:
-                if response.status == 200:
-                    content = await response.text()
-                    if payload in content:
-                        print(f"Vulnerable URL: {url}, Parameter: param, Payload: {payload}")
-                        save_xss_bug(url, 'param', payload, result_dir)
+                print(f"Response status: {response.status} for payload: {payload}")  # Log response status
+                content = await response.text()
+                if payload in content:
+                    print(f"\033[31mVulnerable URL: {url}, Parameter: param, Payload: {payload}\033[0m")
+                    save_xss_bug(url, 'param', payload, result_dir)
+                else:
+                    print(f"\033[32mNo vulnerability found with payload: {payload}\033[0m")
         except Exception as e:
             print(f"Error with URL {url}: {e}")
 
@@ -41,6 +44,7 @@ def save_xss_bug(url, parameter, payload, result_dir):
     file_path = os.path.join(result_dir, "xssbug.txt")
     with open(file_path, "a") as f:
         f.write(f"URL: {url}, Parameter: {parameter}, Payload: {payload}\n")
+    print(f"Saved vulnerable URL: {url} with payload: {payload}")  # Log saving operation
 
 def main():
     parser = argparse.ArgumentParser()
@@ -60,6 +64,7 @@ def main():
         payloads = f.read().splitlines()
 
     start_time = time.time()  # Start time
+    print(f"Starting XSS testing on URL: {url} with payloads from: {payload_file}")
 
     asyncio.run(test_xss(url, payloads, result_dir))
 
