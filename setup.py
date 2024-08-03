@@ -4,8 +4,8 @@ setup(
     name='TGxss07',
     version='1.0',
     description='XSS Vulnerability Finder Tool',
-    author='Your Name',
-    author_email='your.email@example.com',
+    author='TehanG07',
+    author_email='kingstar75114@gmail.com',
     packages=find_packages(),
     entry_points={
         'console_scripts': [
